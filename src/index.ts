@@ -15,6 +15,8 @@ root.appendChild(main);
 import { sales, ISale, items, IItem, departments, IDept } from './data';
 import { Maybe } from './maybe';
 
+/* #region Maybe */
+console.log('*********** maybe');
 interface withSales {
   f01: string;
   f64: number;
@@ -108,9 +110,13 @@ function exists<T>(val: T): val is Exclude<T, null | undefined> {
   return val !== undefined && val !== null;
 }
 
+/* #endregion */
+
+/* #region option */
 console.log('****************** option');
 import { Option, Some, None } from './option';
 
+/* #region Basic Use 1 */
 function divide(numerator: number, denominator: number): Option<number> {
   if (denominator === 0) {
     return None;
@@ -126,7 +132,9 @@ const message = result.match({
 });
 
 console.log(message);
+/* #endregion */
 
+/* #region Basic use 2 */
 type Drink = {
   name: string;
   color: string;
@@ -166,7 +174,9 @@ const caffineMessage = caffineResult.match({
 });
 
 console.log(caffineMessage);
+/* #endregion */
 
+/* #region Users */
 console.log('***************** users');
 
 interface User {
@@ -218,6 +228,9 @@ function expect(value: any) {
   };
 }
 
+/* #endregion */
+
+/* #region expects */
 console.log('*************** expects');
 console.log(expect(Some(2).isSome()).toEqual(true));
 console.log(expect(Some().isSome()).toEqual(false));
@@ -243,7 +256,9 @@ function getName(name: Option<string>): string {
 }
 
 console.log(getName(Some('mike')));
+/* #endregion */
 
+/* #region 3 new friends */
 console.log('********** 3 new friends');
 // andThem
 const sqrt = (x: number): Option<number> => Some(x * x);
@@ -253,7 +268,9 @@ console.log(Some(2).andThen(sqrt).andThen(sqrt).unwrap());
 console.log(Some(2).andThen(sqrt).andThen(nope).isNone());
 console.log(Some(2).andThen(nope).andThen(sqrt).isNone());
 console.log(None.andThen(sqrt).andThen(sqrt).isNone());
+/* #endregion */
 
+/* #region or */
 console.log('******************** or');
 let a = Some(2);
 let b = None;
@@ -270,6 +287,9 @@ console.log(e.or(f).unwrap());
 let h: Option<number> = None;
 let i = None;
 console.log(h.or(i).isNone());
+/* #endregion */
+
+/* #region and */
 
 console.log('************************* and');
 let j = Some(2);
@@ -290,3 +310,6 @@ console.log(o.and(p).unwrap());
 let q: Option<number> = None;
 let r = None;
 console.log(q.and(r).isNone());
+/* #endregion
+
+/* #endregion */
