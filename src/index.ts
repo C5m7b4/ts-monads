@@ -103,3 +103,190 @@ const addDiscount = (s: withDepartment) => {
 };
 const chained = Maybe.chain(addItemDetail, addDepartmentDetail, addDiscount)(sales);
 console.log(chained);
+
+function exists<T>(val: T): val is Exclude<T, null | undefined> {
+  return val !== undefined && val !== null;
+}
+
+console.log('****************** option');
+import { Option, Some, None } from './option';
+
+function divide(numerator: number, denominator: number): Option<number> {
+  if (denominator === 0) {
+    return None;
+  } else {
+    return Some(numerator / denominator);
+  }
+}
+
+const result = divide(2, 0);
+const message = result.match({
+  some: (res) => `result is ${res}`,
+  none: 'cannot divide by zero',
+});
+
+console.log(message);
+
+type Drink = {
+  name: string;
+  color: string;
+  caffineCount: number;
+};
+
+const drinks: Drink[] = [
+  {
+    name: 'coffee',
+    color: 'black',
+    caffineCount: 25,
+  },
+  {
+    name: 'mt dew',
+    color: 'clear',
+    caffineCount: 0,
+  },
+];
+
+const lookupCaffineCount = (name: string, drinks: Drink[]): Option<Drink> => {
+  const drink = drinks.find((d) => d.name === name);
+  if (exists(drink)) {
+    if (exists(drink.caffineCount)) {
+      return Some(drink);
+    }
+  } else {
+    return None;
+  }
+
+  return None;
+};
+
+const caffineResult = lookupCaffineCount('mt dew', drinks);
+const caffineMessage = caffineResult.match({
+  none: 'no caffine in this drink',
+  some: (drink) => `found ${drink.caffineCount} in ${drink.name}`,
+});
+
+console.log(caffineMessage);
+
+console.log('***************** users');
+
+interface User {
+  firstName: string;
+  lastName?: string;
+  nickname?: string;
+}
+
+const users: User[] = [
+  {
+    firstName: 'mike',
+    lastName: 'bedingfield',
+    nickname: 'c5',
+  },
+  {
+    firstName: 'tommy',
+  },
+];
+
+const concateNames = (user: User): Option<string> =>
+  !exists(user.firstName) || !exists(user.lastName) ? None : Some(`${user.firstName} ${user.lastName}`);
+
+const filteredUsers = Maybe.just(users).map((x: User[]) =>
+  x.map((y) => ({
+    ...y,
+    fullName: concateNames(y).match({
+      none: 'there is no fullname. maybe a firstname or lastname is missing, please check',
+      some: (res) => res,
+    }),
+  }))
+);
+
+console.log(filteredUsers.extract());
+
+let x: Option<number> = Some(2);
+console.log(x.isSome());
+let y: Option<number> = None;
+console.log(y.isSome());
+
+function expect(value: any) {
+  return {
+    toEqual: function (expected: any) {
+      if (value === expected) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+  };
+}
+
+console.log('*************** expects');
+console.log(expect(Some(2).isSome()).toEqual(true));
+console.log(expect(Some().isSome()).toEqual(false));
+console.log(expect(Some(undefined).isSome()).toEqual(false));
+console.log(expect(Some(null).isSome()).toEqual(true));
+
+console.log(expect(Some(2).isNone()).toEqual(false));
+console.log(expect(None.isNone()).toEqual(true));
+
+let air = Some('air');
+console.log(air.unwrap());
+let n = None;
+//console.log(n.unwrap());
+
+import { IsSome } from './option';
+
+function getName(name: Option<string>): string {
+  if (IsSome(name)) {
+    return name.unwrap();
+  } else {
+    return 'N/A';
+  }
+}
+
+console.log(getName(Some('mike')));
+
+console.log('********** 3 new friends');
+// andThem
+const sqrt = (x: number): Option<number> => Some(x * x);
+const nope = (_: number): Option<number> => None;
+
+console.log(Some(2).andThen(sqrt).andThen(sqrt).unwrap());
+console.log(Some(2).andThen(sqrt).andThen(nope).isNone());
+console.log(Some(2).andThen(nope).andThen(sqrt).isNone());
+console.log(None.andThen(sqrt).andThen(sqrt).isNone());
+
+console.log('******************** or');
+let a = Some(2);
+let b = None;
+console.log(a.or(b).unwrap());
+
+let c = None;
+let d = Some(100);
+console.log(c.or(d).unwrap());
+
+let e = Some(2);
+let f = Some(100);
+console.log(e.or(f).unwrap());
+
+let h: Option<number> = None;
+let i = None;
+console.log(h.or(i).isNone());
+
+console.log('************************* and');
+let j = Some(2);
+let k = None;
+console.log(j.and(k).isNone());
+// if first value is nothig then nothing
+// else if it is something then return the second value
+// ????????????????????
+
+let l = None;
+let m = Some(100);
+console.log(l.and(m).isNone());
+
+let o = Some(1);
+let p = Some(100);
+console.log(o.and(p).unwrap());
+
+let q: Option<number> = None;
+let r = None;
+console.log(q.and(r).isNone());
